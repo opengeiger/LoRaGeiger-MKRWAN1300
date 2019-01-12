@@ -9,6 +9,9 @@ LoRaModem modem;
 // Please enter your sensitive data in the Secret tab or arduino_secrets.h
 String appEui = "";
 String appKey = "";
+// Leave this empty to use the default device eui. In that case the eui will
+// be sent over the serial port.
+String devEui = "";
 
 CayenneLPP lpp(51);
 
@@ -34,16 +37,28 @@ void setup()
     Serial.println("Failed to start module");
     while (1) {}
   };
+
   Serial.print("Your module version is: ");
   Serial.println(modem.version());
-  Serial.print("Your device EUI is: ");
+  Serial.print("Your current device EUI is: ");
   Serial.println(modem.deviceEUI());
+  Serial.print("Trying to join the LoRaWan network... ");
 
-  int connected = modem.joinOTAA(appEui, appKey);
+  int connected;
+  if (devEui.length() > 0) {
+    connected = modem.joinOTAA(appEui, appKey, devEui);
+  } else {
+    connected = modem.joinOTAA(appEui, appKey);
+  }
+
   if (!connected) {
-    Serial.println("Something went wrong; are you indoor? Move near a window and retry");
+    Serial.println("Something went wrong; are you indoors? Move near a window and retry");
     while (1) {}
   }
+  Serial.println("Success!");
+
+  Serial.print("After connecting your device EUI is: ");
+  Serial.println(modem.deviceEUI());
 
   // Set poll interval to 60 secs.
   modem.minPollInterval(60);
