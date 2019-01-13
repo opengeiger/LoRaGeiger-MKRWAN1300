@@ -38,13 +38,14 @@ void setup()
   Serial.println(modem.version());
   Serial.print("Your device EUI is: ");
   Serial.println(modem.deviceEUI());
-
+  Serial.println("Trying to join TTN ...");
   int connected = modem.joinOTAA(appEui, appKey);
   if (!connected) {
     Serial.println("Something went wrong; are you indoor? Move near a window and retry");
     while (1) {}
   }
-
+  else
+    Serial.println("Successfully joined");
   // Set poll interval to 60 secs.
   modem.minPollInterval(60);
   // NOTE: independently by this setting the modem will
@@ -52,6 +53,7 @@ void setup()
   // this is enforced by firmware and can not be changed.
 
   attachInterrupt(digitalPinToInterrupt(0), count, FALLING); 
+  Serial.println("Start waiting for geiger pulses ...");
 }
 
 void loop()
